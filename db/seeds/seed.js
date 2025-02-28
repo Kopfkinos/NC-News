@@ -1,6 +1,6 @@
 const db = require("../connection")
 const format = require("pg-format")
-const {convertTimestampToDate} = require("./utils")
+const {convertTimestampToDate, createLookupObj} = require("./utils")
 
 const seed = ({ topicData, userData, articleData, commentData }) => {
   return db.query("DROP TABLE IF EXISTS comments;")
@@ -28,15 +28,13 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
     return insertUsers(userData)
   })
   .then(() => {
-    return insertTopics(userData, topicData)
+    return insertTopics(topicData)
   })
   .then(() => {
-    return insertArticles(articleData, userData, topicData) 
+    return insertArticles(articleData) 
   })
-  .then((articleDataWithIds) => {
-    console.log("Last then block has access to this!:", articleDataWithIds)
-    // articleData[i].article_id
-    return insertComments(userData, articleDataWithIds, commentData)
+  .then((articlesDataWithIds) => {
+    return insertComments(articlesDataWithIds, commentData)
   })
   })
 }
@@ -96,7 +94,7 @@ function insertUsers (userData) {
   })
 }
 
-function insertTopics (userData, topicData) {
+function insertTopics (topicData) {
 
   const fomrattedTopicData = topicData.map((topic) => {
     return [topic.slug, topic.description, topic.img_url]
@@ -115,8 +113,8 @@ function insertArticles(articleData) {
   const formattedArticleData = articleData.map((article) => {
     return [
       article.title, 
-      0, // dynamically lookup topic
-      0, // dynamically lookup author
+      article.topic, // need to check that topic slug exists?
+      article.author, 
       article.body,
       convertTimestampToDate(article).created_at,
       article.votes,
@@ -137,13 +135,16 @@ function insertArticles(articleData) {
 )
 }
 
-function insertComments (userData, articleDataWithIds, commentData) {
+function insertComments (articlesDataWithIds, commentData) {
+  
+  const articleLookupObj = createLookupObj(articlesDataWithIds, "title", "article_id")
+
   const formattedCommentData = commentData.map((comment) => {
     return [
-      0, // article_id - via lookupObj that pairs article_ids and titles
+      articleLookupObj[comment.article_title],
       comment.body,
       comment.votes,
-      comment.author, // function that checks if the author === an existing user? 
+      comment.author, // check if the author is an existing user? 
       convertTimestampToDate(comment).created_at 
     ]
   })

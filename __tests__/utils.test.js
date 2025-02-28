@@ -1,5 +1,5 @@
 const {
-  convertTimestampToDate
+  convertTimestampToDate, createLookupObj
 } = require("../db/seeds/utils");
 
 describe("convertTimestampToDate", () => {
@@ -38,3 +38,32 @@ describe("convertTimestampToDate", () => {
   });
 });
 
+describe("createLookupObj", () => {
+  test("returns an object", () => {
+      const actual = createLookupObj([], "", "")
+      expect(actual).toEqual({})
+  })
+  test("returns ref object with key value pair matching the keys passed in when passed in arr with one obj and two keys", () => {
+      const inputArray = 
+          [{ name: "Rose", id: "dS8rJns", secretFear: "spiders" }]
+      const actual = createLookupObj(inputArray, "name", "id")
+      expect(Object.keys(actual)[0]).toBe("Rose")
+      expect(Object.values(actual)[0]).toBe("dS8rJns")
+  })
+  test("Test with multiple objects in the array", () => {
+      const inputArray = [
+          { name: "Rose", id: "dS8rJns", secretFear: "spiders" },
+          { name: "Simon", id: "Pk34ABs", secretFear: "mice" },
+          { name: "Jim", id: "lk1ff8s", secretFear: "bears" },
+          { name: "David", id: "og8r0nV", secretFear: "Rose" },
+      ]
+      const result = createLookupObj(inputArray, "name", "id")
+      expect(Object.keys(result)[0]).toBe("Rose")
+      expect(Object.values(result)[0]).toBe("dS8rJns")
+      expect(Object.keys(result)[1]).toBe("Simon")
+      expect(Object.values(result)[1]).toBe("Pk34ABs")
+      expect(Object.keys(result)[2]).toBe("Jim")
+      expect(Object.values(result)[2]).toBe("lk1ff8s")
+      expect(Object.keys(result)[3]).toBe("David")
+  })
+})
