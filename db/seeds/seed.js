@@ -53,13 +53,16 @@ function createTopics () {
       description VARCHAR(100) NOT NULL,
       img_url VARCHAR(1000));`)
 }
+
 function createArticles () {
   return db.query(`
     CREATE TABLE articles (
       article_id SERIAL PRIMARY KEY,
       title VARCHAR,
-      topic VARCHAR,
-      author VARCHAR,
+      topic VARCHAR 
+        CONSTRAINT fk_topic REFERENCES topics(slug),
+      author VARCHAR
+        CONSTRAINT fk_author REFERENCES users(username),
       body TEXT,
       created_at TIMESTAMP,
       votes INTEGER,
@@ -69,10 +72,12 @@ function createComments () {
   return db.query(`
     CREATE TABLE comments (
       comment_id SERIAL PRIMARY KEY,
-      article_id INTEGER,
+      article_id INTEGER
+        CONSTRAINT fk_article_id REFERENCES articles(article_id),
       body TEXT,
       votes INT,
-      author VARCHAR,
+      author VARCHAR 
+        CONSTRAINT fk_author REFERENCES users(username),
       created_at TIMESTAMP);`)
 }
 
@@ -97,7 +102,12 @@ function insertUsers (userData) {
 function insertTopics (topicData) {
 
   const fomrattedTopicData = topicData.map((topic) => {
-    return [topic.slug, topic.description, topic.img_url]
+    console.log(topic)
+    return [
+      topic.slug, 
+      topic.description, 
+      topic.img_url
+    ]
   })
 
   const insertIntoTopicsStr = format(
@@ -114,11 +124,11 @@ function insertArticles(articleData) {
     return [
       article.title, 
       article.topic, // need to check that topic slug exists?
-      article.author, 
+      article.author, // 
       article.body,
       convertTimestampToDate(article).created_at,
       article.votes,
-      article.img_url
+      article.article_img_url
     ]
   })
 
