@@ -1,0 +1,5 @@
+exports.handleServerErrors = (err, req, res, next) => {
+  res.status(500).send({
+    msg: "Gordon Bennett! There's been a wee internal server error! Contact the server administrator.",
+  })
+}

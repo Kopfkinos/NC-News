@@ -28,7 +28,7 @@ describe("GET /api", () => {
   })
 })
 
-/* describe("GET /api/topics", () => {
+describe("GET /api/topics", () => {
   test("200: Responds with array of topic objects", () => {
     return request(app)
       .get("/api/topics")
@@ -49,4 +49,3 @@ describe("GET /api", () => {
       })
   })
 })
- */

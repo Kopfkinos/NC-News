@@ -12,7 +12,7 @@ app.get("/api", (req, res) => {
   res.status(200).send({ endpoints: endpointsList })
 })
 
-/* // Endpoints
+// Endpoints
 app.get("/api/topics", getTopics)
 
 // Error handling
@@ -22,5 +22,5 @@ app.use(handleServerErrors)
 app.all("*", (req, res) => {
   res.status(404).send({ msg: "That path doesn't exist on this server! :(" })
 })
- */
+
 module.exports = app
