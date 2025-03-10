@@ -15,7 +15,7 @@ app.get("/api", (req, res) => {
 // Endpoints
 app.get("/api/topics", getTopics)
 
-// Error handling
+// Error handlers
 app.use(handleServerErrors)
 
 // Catch-all
