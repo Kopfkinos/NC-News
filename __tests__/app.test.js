@@ -143,3 +143,48 @@ describe("/api/articles", () => {
       })
   })
 })
+
+describe("/api/articles/:article_id/comments", () => {
+  test("200: responds with array with comment objs for specified article", () => {
+    return request(app)
+      .get("/api/articles/3/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body
+        console.log(body.comments)
+        comments.forEach((comment) => {
+          expect(typeof comment.comment_id).toBe("number")
+          expect(typeof comment.votes).toBe("number")
+          expect(typeof comment.created_at).toBe("string")
+          expect(typeof comment.author).toBe("string")
+          expect(typeof comment.body).toBe("string")
+          expect(comment.article_id).toBe(3)
+        })
+      })
+  })
+  test("200: comments arr is ordered by most recent first", () => {
+    return request(app)
+      .get("/api/articles/3/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body
+        expect(comments).toBeSorted({ key: "created_at", descending: true })
+      })
+  })
+  test("404: when non-existant article id is given", () => {
+    return request(app)
+      .get("/api/articles/1991/comments")
+      .expect(404)
+      .then(({ body: msg }) => {
+        expect(msg.msg).toBe("Path not found")
+      })
+  })
+  test("400: invalid request error when invalid article id is given", () => {
+    return request(app)
+      .get("/api/articles/kissykissy/comments")
+      .expect(400)
+      .then(({ body: msg }) => {
+        expect(msg.msg).toBe("You are valid, but that path you entered is not.")
+      })
+  })
+})
