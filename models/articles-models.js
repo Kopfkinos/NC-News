@@ -28,3 +28,18 @@ exports.fetchArticleComments = (article_id) => {
       return rows
     })
 }
+
+exports.addCommentToArticle = (article_id, comment) => {
+  if (typeof comment.username !== "string" || typeof comment.body !== "string") {
+    return Promise.reject({ status: 400, msg: "keep those invalid comments to yourself!" })
+  }
+  return db
+    .query("INSERT INTO comments (article_id, author, body) VALUES ($1, $2, $3)RETURNING *", [
+      article_id,
+      comment.username,
+      comment.body,
+    ])
+    .then(({ rows }) => {
+      return rows
+    })
+}

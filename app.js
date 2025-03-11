@@ -13,7 +13,11 @@ const {
   getArticleById,
   getAllArticles,
   getArticleComments,
+  postCommentToArticle,
 } = require("./controllers/article-controllers")
+
+// Parse request bodies --> // req.body
+app.use(express.json())
 
 // API index endpoint
 const endpointsList = require("./endpoints.json")
@@ -30,6 +34,7 @@ app.get("/api/articles/:article_id", getArticleById)
 app.get("/api/articles/:article_id/comments", getArticleComments)
 
 app.get("/api/articles", getAllArticles)
+app.post("/api/articles/:article_id", postCommentToArticle)
 
 // Error handlers
 app.use(handleCustomErrors)
