@@ -9,7 +9,11 @@ const {
   handleCatchAllError,
   handlePsqlErrors,
 } = require("./controllers/error-controllers")
-const { getArticleById, getAllArticles } = require("./controllers/article-controllers")
+const {
+  getArticleById,
+  getAllArticles,
+  getArticleComments,
+} = require("./controllers/article-controllers")
 
 // API index endpoint
 const endpointsList = require("./endpoints.json")
@@ -22,6 +26,8 @@ app.get("/api", (req, res) => {
 app.get("/api/topics", getTopics)
 
 app.get("/api/articles/:article_id", getArticleById)
+
+app.get("/api/articles/:article_id/comments", getArticleComments)
 
 app.get("/api/articles", getAllArticles)
 

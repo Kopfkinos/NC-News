@@ -39,5 +39,17 @@
       "votes": 0,
       "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
     }
+  },
+  "GET /api/articles/:article_id//comments": {
+    "description": "serves comments on article with specified article id",
+    "queries": [],
+    "example response": {
+      "comment_id": 10,
+      "article_id": 3,
+      "body": "git push origin master",
+      "votes": 0,
+      "author": "icellusedkars",
+      "created_at": "2020-06-20T07:24:00.000Z"
+    }
   }
 }
