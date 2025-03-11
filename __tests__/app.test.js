@@ -84,3 +84,62 @@ describe("/api/articles/:article_id", () => {
       })
   })
 })
+describe("/api/articles", () => {
+  test("200: returns an array of all article objs in the database", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const articles = body.articles
+        articles.forEach((article) => {
+          expect(typeof article.author).toBe("string")
+          expect(typeof article.title).toBe("string")
+          expect(typeof article.article_id).toBe("number")
+          expect(typeof article.topic).toBe("string")
+          expect(typeof article.created_at).toBe("string")
+          expect(typeof article.votes).toBe("number")
+          expect(typeof article.article_img_url).toBe("string")
+        })
+      })
+  })
+  test("200: articles objs in arr do not contain body property", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const articles = body.articles
+        articles.forEach((article) => {
+          expect(typeof article.body).toBe("undefined")
+        })
+      })
+  })
+  test("200: article objs sorted in desc order by date", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const articles = body.articles
+        expect(articles).toBeSorted({ key: "created_at", descending: true })
+      })
+  })
+  test("200: article objs contain a comment_count", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const articles = body.articles
+        articles.forEach((article) => {
+          expect(typeof Number(article.comment_count)).toBe("number")
+          expect(isNaN(Number(article.comment_count))).toBe(false)
+        })
+      })
+  })
+  test("404: responds with 404 if user enters wrong address", () => {
+    return request(app)
+      .get("/api/artocles")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Sorry, but that path doesn't exist on this server.")
+      })
+  })
+})
