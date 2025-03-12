@@ -82,5 +82,14 @@
     "description": "removes comment with the specified comment id",
     "queries": [],
     "exampleResponse": {}
+  },
+  "GET /api/users": {
+    "description": "serves an array of all users",
+    "queries": [],
+    "exampleResponse": {
+      "users": [
+        { "username": "Perri Stryker", "name": "Gorbachov", "avatar_url": "www.glasnost.su" }
+      ]
+    }
   }
 }

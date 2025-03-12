@@ -425,3 +425,32 @@ describe("DELETE /api/comments/:comment_id", () => {
       })
   })
 })
+
+describe("GET /api/users", () => {
+  test("200: responds with an array containing ALL user objs", () => {
+    let userCount = 0
+
+    return db.query(`SELECT * FROM users`).then(({ rows }) => {
+      userCount = rows.length
+      return request(app)
+        .get(`/api/users`)
+        .expect(200)
+        .then(({ body: { users } }) => {
+          expect(users.length).toBe(userCount)
+        })
+    })
+  })
+  test("200: user objs have username, name, avatar_url properties", () => {
+    return request(app)
+      .get(`/api/users`)
+      .expect(200)
+      .then(({ body: { users } }) => {
+        users.forEach((user) => {
+          console.log(user.username)
+          expect(typeof user.username).toBe("string")
+          expect(typeof user.name).toBe("string")
+          expect(typeof user.avatar_url).toBe("string")
+        })
+      })
+  })
+})
