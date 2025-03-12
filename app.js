@@ -20,6 +20,8 @@ const {
 
 const { deleteComment } = require("./controllers/comment-controllers")
 
+const { getUsers } = require("./controllers/user-controllers")
+
 // Parse request bodies --> // req.body
 app.use(express.json())
 
@@ -31,6 +33,8 @@ app.get("/api", (req, res) => {
 })
 
 // Endpoints
+app.get("/api/users", getUsers)
+
 app.get("/api/topics", getTopics)
 
 app.get("/api/articles/:article_id", getArticleById)
