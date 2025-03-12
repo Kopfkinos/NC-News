@@ -394,7 +394,7 @@ describe("PATCH /api/articles/:articles", () => {
       })
   })
 })
-describe.only("DELETE /api/comments/:comment_id", () => {
+describe("DELETE /api/comments/:comment_id", () => {
   test("receives a 204 status and no content", () => {
     const comment_id = 1
 
