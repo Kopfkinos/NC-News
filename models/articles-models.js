@@ -43,3 +43,23 @@ exports.addCommentToArticle = (article_id, comment) => {
       return rows
     })
 }
+
+exports.updateArticleVotes = (article_id, votes) => {
+  if (votes === undefined || typeof votes !== "number") {
+    return Promise.reject({
+      status: 400,
+      msg: "The sent vote obj was invalid. Did someone say election interference?",
+    })
+  }
+  return db
+    .query(`UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *`, [
+      votes,
+      article_id,
+    ])
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "That article doesn't exist (yet...?)" })
+      }
+      return rows
+    })
+}

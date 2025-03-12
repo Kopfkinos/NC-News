@@ -188,7 +188,7 @@ describe("GET /api/articles/:article_id/comments", () => {
   })
 })
 
-describe("POST /api/articles/:artilces/comments", () => {
+describe("POST /api/articles/:articles/comments", () => {
   test("201: comment body is added to comments table", () => {
     const newComment = {
       username: "lurker",
@@ -239,7 +239,6 @@ describe("POST /api/articles/:artilces/comments", () => {
       .expect(201)
       .then((response) => {
         const postedComment = JSON.parse(response.text).comment[0]
-        console.log(postedComment)
         expect(typeof postedComment.comment_id).toBe("number")
         expect(postedComment.article_id).toBe(1)
         expect(postedComment.body).toBe(newComment.body)
@@ -293,6 +292,105 @@ describe("POST /api/articles/:artilces/comments", () => {
       .expect(400)
       .then(({ body: response }) => {
         expect(response.msg).toBe("keep those invalid comments to yourself!")
+      })
+  })
+})
+
+describe("PATCH /api/articles/:articles", () => {
+  test("201: updates article with +100 votes when sent inc_votes object with value of 100", async () => {
+    // Tried out using async/await in a test that would otherwise have three levels of nesting. But I actually think it looks messier?
+
+    const votesToAdd = { inc_votes: 100 }
+    const articleToUpdate = 1
+
+    const { rows } = await db.query(`SELECT votes FROM articles WHERE article_id = $1`, [
+      articleToUpdate,
+    ])
+    const oldVotes = rows[0].votes
+
+    await request(app).patch(`/api/articles/${articleToUpdate}`).send(votesToAdd).expect(201)
+
+    const updatedResponse = await db.query(`SELECT votes FROM articles WHERE article_id = $1`, [
+      articleToUpdate,
+    ])
+
+    const updatedVotes = updatedResponse.rows[0].votes
+    expect(updatedVotes === oldVotes + 100).toBe(true)
+
+    /* return db
+      .query(`SELECT votes FROM articles WHERE article_id = $1`, [articleToUpdate])
+      .then(({ rows }) => {
+        const oldVoteTally = rows[0].votes
+      })
+      .then(() => {
+        return request(app)
+          .patch(`/api/articles/${articleToUpdate}`)
+          .send(votesToAdd)
+          .expect(404)
+          .then(() => {
+            return db
+              .query(`SELECT votes FROM articles WHERE article_id = $1`, [articleToUpdate])
+              .then(({ rows }) => {
+                const updatedVotes = rows[0]
+              })
+          })
+      }) */
+  })
+  test("201: responds with updated article obj", () => {
+    const votesToAdd = { inc_votes: 100 }
+
+    return request(app)
+      .patch(`/api/articles/1`)
+      .send(votesToAdd)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.length === 1).toBe(true)
+        const articleObj = body[0]
+        expect(articleObj.article_id).toBe(1)
+        expect(typeof articleObj.author).toBe("string")
+        expect(typeof articleObj.title).toBe("string")
+        expect(typeof articleObj.body).toBe("string")
+        expect(typeof articleObj.topic).toBe("string")
+        expect(typeof articleObj.created_at).toBe("string")
+        expect(typeof articleObj.votes).toBe("number")
+        expect(typeof articleObj.article_img_url).toBe("string")
+      })
+  })
+  test("404: article_id valid but doesn't exist", () => {
+    const votesToAdd = { inc_votes: 100 }
+
+    return request(app)
+      .patch(`/api/articles/1991`)
+      .send(votesToAdd)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("That article doesn't exist (yet...?)")
+      })
+  })
+  test("400: votes obj has invalid key", () => {
+    const votesToAdd = { colusion: 100 }
+
+    return request(app)
+      .patch(`/api/articles/1991`)
+      .send(votesToAdd)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe(
+          "The sent vote obj was invalid. Did someone say election interference?"
+        )
+      })
+  })
+  test("400: votes obj has value that is not a number", () => {
+    const votesToAdd = { inc_votes: "onehundred" }
+
+    return request(app)
+      .patch(`/api/articles/1991`)
+      .send(votesToAdd)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe(
+          "The sent vote obj was invalid. Did someone say election interference?"
+        )
       })
   })
 })
