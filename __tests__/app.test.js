@@ -401,9 +401,7 @@ describe("DELETE /api/comments/:comment_id", () => {
     return request(app)
       .delete(`/api/comments/1`)
       .expect(204)
-      .then((response) => {
-        console.log(response)
-      })
+      .then((response) => {})
   })
   test("removes comment with specified comment_id from db", () => {
     const comment_id = 1
@@ -446,11 +444,81 @@ describe("GET /api/users", () => {
       .expect(200)
       .then(({ body: { users } }) => {
         users.forEach((user) => {
-          console.log(user.username)
           expect(typeof user.username).toBe("string")
           expect(typeof user.name).toBe("string")
           expect(typeof user.avatar_url).toBe("string")
         })
+      })
+  })
+})
+
+describe("GET /api/articles (sorting queries)", () => {
+  test("200: ?sort_by=topic sorts the articles by topic in descending order", () => {
+    return request(app)
+      .get(`/api/articles?sort_by=topic`)
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSorted({ key: "topic", descending: "true" })
+      })
+  })
+  test("200: ?sort_by=author sorts the articles by author in descending order", () => {
+    return request(app)
+      .get(`/api/articles?sort_by=author`)
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSorted({ key: "author", descending: "true" })
+      })
+  })
+  test("200: ?sort_by=votes sorts the articles by votes in descending order", () => {
+    return request(app)
+      .get(`/api/articles?sort_by=votes`)
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSorted({ key: "votes", descending: "true" })
+      })
+  })
+  test("200: ?order=asc sorts the articles by created_at in ascending order", () => {
+    return request(app)
+      .get(`/api/articles?order=asc`)
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSorted({ key: "created_at" })
+      })
+  })
+  test("200: ?sort_by=author&order=asc sorts the articles by author in ascending order", () => {
+    return request(app)
+      .get(`/api/articles?sort_by=author&order=asc`)
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSorted({ key: "author" })
+      })
+  })
+  test("200: ?sort_by=votes&order=desc sorts the articles by author in descending order", () => {
+    return request(app)
+      .get(`/api/articles?sort_by=votes&order=desc`)
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSorted({ key: "votes", descending: "true" })
+      })
+  })
+  test("400: invalid sort query responds with custom error", () => {
+    return request(app)
+      .get(`/api/articles?sort_by=chickens`)
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe(
+          "There are no bad questions, but there are bad queries, much like the one you just entered."
+        )
+      })
+  })
+  test("400: invalid order query responds with custom error", () => {
+    return request(app)
+      .get(`/api/articles?sort_by=votes&order=flatline`)
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe(
+          "There are no bad questions, but there are bad queries, much like the one you just entered."
+        )
       })
   })
 })
