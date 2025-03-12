@@ -75,10 +75,10 @@ function createComments() {
       article_id INTEGER
         CONSTRAINT fk_article_id REFERENCES articles(article_id),
       body TEXT,
-      votes INT,
+      votes INT DEFAULT 0,
       author VARCHAR 
         CONSTRAINT fk_author REFERENCES users(username),
-      created_at TIMESTAMP);`)
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP(0));`)
 }
 
 function insertUsers(userData) {
