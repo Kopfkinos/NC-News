@@ -394,3 +394,34 @@ describe("PATCH /api/articles/:articles", () => {
       })
   })
 })
+describe("DELETE /api/comments/:comment_id", () => {
+  test("receives a 204 status and no content", () => {
+    const comment_id = 1
+
+    return request(app)
+      .delete(`/api/comments/1`)
+      .expect(204)
+      .then((response) => {
+        console.log(response)
+      })
+  })
+  test("removes comment with specified comment_id from db", () => {
+    const comment_id = 1
+    return request(app)
+      .delete(`/api/comments/1`)
+      .expect(204)
+      .then(() => {
+        db.query(`SELECT * FROM comments where comment_id = ${comment_id}`).then(({ rows }) => {
+          expect(rows.length).toBe(0)
+        })
+      })
+  })
+  test("comment_id is valid but doesn't exist", () => {
+    return request(app)
+      .delete(`/api/comments/1991`)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("That comment doesn't exist (yet...?)")
+      })
+  })
+})
