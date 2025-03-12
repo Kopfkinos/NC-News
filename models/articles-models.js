@@ -28,3 +28,38 @@ exports.fetchArticleComments = (article_id) => {
       return rows
     })
 }
+
+exports.addCommentToArticle = (article_id, comment) => {
+  if (typeof comment.username !== "string" || typeof comment.body !== "string") {
+    return Promise.reject({ status: 400, msg: "keep those invalid comments to yourself!" })
+  }
+  return db
+    .query("INSERT INTO comments (article_id, author, body) VALUES ($1, $2, $3)RETURNING *", [
+      article_id,
+      comment.username,
+      comment.body,
+    ])
+    .then(({ rows }) => {
+      return rows
+    })
+}
+
+exports.updateArticleVotes = (article_id, votes) => {
+  if (votes === undefined || typeof votes !== "number") {
+    return Promise.reject({
+      status: 400,
+      msg: "The sent vote obj was invalid. Did someone say election interference?",
+    })
+  }
+  return db
+    .query(`UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *`, [
+      votes,
+      article_id,
+    ])
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "That article doesn't exist (yet...?)" })
+      }
+      return rows
+    })
+}
