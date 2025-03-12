@@ -4,6 +4,7 @@ const app = express()
 
 // Importing controllers
 const { getTopics } = require("./controllers/topics-controller")
+
 const {
   handleServerErrors,
   handleCatchAllError,
@@ -16,6 +17,8 @@ const {
   postCommentToArticle,
   patchArticleVotes,
 } = require("./controllers/article-controllers")
+
+const { deleteComment } = require("./controllers/comment-controllers")
 
 // Parse request bodies --> // req.body
 app.use(express.json())
@@ -37,6 +40,8 @@ app.get("/api/articles/:article_id/comments", getArticleComments)
 app.get("/api/articles", getAllArticles)
 app.post("/api/articles/:article_id", postCommentToArticle)
 app.patch("/api/articles/:article_id", patchArticleVotes)
+
+app.delete("/api/comments/:comment_id", deleteComment)
 
 // Error handlers
 app.use(handleCustomErrors)
