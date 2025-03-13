@@ -50,7 +50,7 @@ This repo uses Jest to run tests and Supertest to test API requests. There are t
 You can run all of these tests in combination via the following npm script:
 
 ```bash
-  npm test
+npm test
 ```
 
 If you wish to only run a certain test suite, you can include a key word after this command such as "seed", "app" or "utils", respectively. e.g. To test the seeding file:
