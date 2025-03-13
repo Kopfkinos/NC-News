@@ -45,14 +45,14 @@ npm run seed-dev
 ```
 
 - How to Run Tests
-  This repo uses Jest to run tests and Supertest to test API requests. There are three test suits, one for the seed file, one for the Express App and one for various utility functions.
-  You can run all of these tests in combination via the following npm script:
+This repo uses Jest to run tests and Supertest to test API requests. There are three test suits, one for the seed file, one for the Express App and one for various utility functions.
+You can run all of these tests in combination via the following npm script:
 
   ```javascript
   npm test
   ```
 
-  If you wish to only run a certain test suite, you can include a key word after this command such as "seed", "app" or "utils", respectively. e.g. To test the seeding file:
+If you wish to only run a certain test suite, you can include a key word after this command such as "seed", "app" or "utils", respectively. e.g. To test the seeding file:
 
   ```javascript
   npm test seed
