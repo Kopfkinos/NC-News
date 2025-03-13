@@ -2,7 +2,7 @@
 
 - What Is This Project?
 
-This project is a simple API designed to help me practical experience in building a backend service that accepts queries and is able to respond with data from a server.
+This project is a simple API designed to give me practical experience in building a backend service.
 
 This API replicates the functionality of a simple news site, responding with data on users, articles, topics and comments from a database I have seeded.
 
