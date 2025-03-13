@@ -554,7 +554,7 @@ describe("GET /api/articles (topic query)", () => {
   })
 })
 
-describe.only("GET /api/articles/:article_id (comment count)", () => {
+describe("GET /api/articles/:article_id (comment count)", () => {
   test("200: article response obj contains comment_count", () => {
     return request(app)
       .get(`/api/articles/9`)
