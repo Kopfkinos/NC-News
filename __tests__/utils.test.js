@@ -72,7 +72,6 @@ describe("generatePromiseReject", () => {
     generatePromiseReject(404, "error")
       .then(() => {})
       .catch((errorObj) => {
-        console.log(errorObj)
         expect(errorObj.status).toBe(404)
       })
   })
