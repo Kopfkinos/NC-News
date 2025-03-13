@@ -72,7 +72,7 @@ describe("GET /api/articles/:article_id", () => {
       .get("/api/articles/1999")
       .expect(404)
       .then(({ body: msg }) => {
-        expect(msg.msg).toBe("Path not found")
+        expect(msg.msg).toBe("article doesn't exist! (yet...)")
       })
   })
   test("400: responds with invalid path error when article_id is invalid", () => {
@@ -175,7 +175,7 @@ describe("GET /api/articles/:article_id/comments", () => {
       .get("/api/articles/1991/comments")
       .expect(404)
       .then(({ body: msg }) => {
-        expect(msg.msg).toBe("Path not found")
+        expect(msg.msg).toBe("article doesn't exist! (yet...)")
       })
   })
   test("400: invalid request error when invalid article id is given", () => {
@@ -254,7 +254,7 @@ describe("POST /api/articles/:articles/comments", () => {
       .send(newComment)
       .expect(400)
       .then(({ body: response }) => {
-        expect(response.msg).toBe("keep those invalid comments to yourself!")
+        expect(response.msg).toBe("Keep invalid comments to yourself")
       })
   })
   test("400: responds with error when sent request body without a username", () => {
@@ -266,7 +266,7 @@ describe("POST /api/articles/:articles/comments", () => {
       .send(newComment)
       .expect(400)
       .then(({ body: response }) => {
-        expect(response.msg).toBe("keep those invalid comments to yourself!")
+        expect(response.msg).toBe("Keep invalid comments to yourself")
       })
   })
   test("400: responds with error when sent request body without a body", () => {
@@ -278,7 +278,7 @@ describe("POST /api/articles/:articles/comments", () => {
       .send(newComment)
       .expect(400)
       .then(({ body: response }) => {
-        expect(response.msg).toBe("keep those invalid comments to yourself!")
+        expect(response.msg).toBe("Keep invalid comments to yourself")
       })
   })
   test("400: responds with error when sent username/body values that are not strings", () => {
@@ -291,7 +291,7 @@ describe("POST /api/articles/:articles/comments", () => {
       .send(newComment)
       .expect(400)
       .then(({ body: response }) => {
-        expect(response.msg).toBe("keep those invalid comments to yourself!")
+        expect(response.msg).toBe("Keep invalid comments to yourself")
       })
   })
 })
@@ -364,7 +364,7 @@ describe("PATCH /api/articles/:articles", () => {
       .send(votesToAdd)
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe("That article doesn't exist (yet...?)")
+        expect(body.msg).toBe("article doesn't exist! (yet...)")
       })
   })
   test("400: votes obj has invalid key", () => {
@@ -419,7 +419,7 @@ describe("DELETE /api/comments/:comment_id", () => {
       .delete(`/api/comments/1991`)
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe("That comment doesn't exist (yet...?)")
+        expect(body.msg).toBe("comment doesn't exist! (yet...)")
       })
   })
 })
@@ -519,6 +519,37 @@ describe("GET /api/articles (sorting queries)", () => {
         expect(msg).toBe(
           "There are no bad questions, but there are bad queries, much like the one you just entered."
         )
+      })
+  })
+})
+describe("GET /api/articles (topic query)", () => {
+  test("200: responds with arr of only article objs with 'mitch' topic", () => {
+    return request(app)
+      .get(`/api/articles?topic=mitch`)
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        articles.forEach((article) => {
+          expect(article.topic).toBe("mitch")
+        })
+      })
+  })
+  test("404: responds with path not found error when querying a topic that doesn't exist", () => {
+    return request(app)
+      .get(`/api/articles?topic=diva`)
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Topic doesn't exist! (yet...)")
+      })
+  })
+  test("400: responds with bad request error when passed a topic query that is longer than 200 chars", () => {
+    const tooLongQuery =
+      "tyuuoedgtfmzdgxiedeuhjzgrmnklewwohscakdocqnflrbkuraaudgxjugkgnupxlatogqkejgryqfcrnwhznwrqnybejfqjsxewerpkqliwebtsermzyivujbyjmjtagbbxtbmeqrfohwwlbwmbvdpzewagcawrhthadutffwquwrpqstsmbafkdrgoontyhdpnnovdo"
+
+    return request(app)
+      .get(`/api/articles?topic=${tooLongQuery}`)
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Invalid topic string query!")
       })
   })
 })
