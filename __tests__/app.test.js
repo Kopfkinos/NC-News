@@ -553,3 +553,14 @@ describe("GET /api/articles (topic query)", () => {
       })
   })
 })
+
+describe("GET /api/articles/:article_id (comment count)", () => {
+  test("200: article response obj contains comment_count", () => {
+    return request(app)
+      .get(`/api/articles/9`)
+      .expect(200)
+      .then(({ body: { article } }) => {
+        expect(article[0].comment_count).toBe("2")
+      })
+  })
+})

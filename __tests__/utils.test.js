@@ -67,12 +67,11 @@ describe("createLookupObj", () => {
   })
 })
 
-describe.only("generatePromiseReject", () => {
+describe("generatePromiseReject", () => {
   test("generates a Promise Reject with passed in error status", () => {
     generatePromiseReject(404, "error")
       .then(() => {})
       .catch((errorObj) => {
-        console.log(errorObj)
         expect(errorObj.status).toBe(404)
       })
   })
