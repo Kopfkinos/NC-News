@@ -9,7 +9,10 @@ This API replicates the functionality of a simple news site, responding with dat
 The live version has been deployed via Render and can be found here:
 https://nc-news-2dis.onrender.com/
 
+
+
 - How to Run This Repo Locally
+
 Enter the following commands into your terminal to get this project running on your system locally.
 
 1. Clone this repo to your system:
