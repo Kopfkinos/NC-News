@@ -41,7 +41,7 @@ You will also need to set some environment variables to specify whether you are 
 npm run setup-dbs
 ```
 
-4. Seed your databases:
+5. Seed your databases:
 
 ```bash
 npm run seed-dev
