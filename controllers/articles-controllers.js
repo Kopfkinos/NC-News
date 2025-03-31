@@ -1,15 +1,9 @@
-const { sort } = require("../db/data/test-data/articles")
-const {
-  fetchArticleById,
-  fetchAllArticles,
-  fetchArticleComments,
-  addCommentToArticle,
-  updateArticleVotes,
-} = require("../models/articles-models")
+const models = require("../models/models-index")
 
 exports.getArticleById = (req, res, next) => {
   const { article_id } = req.params
-  fetchArticleById(article_id)
+  models
+    .fetchArticleById(article_id)
     .then((article) => {
       res.status(200).send({ article })
     })
@@ -21,7 +15,8 @@ exports.getArticleById = (req, res, next) => {
 exports.getAllArticles = (req, res, next) => {
   const { sort_by, order, topic } = req.query
 
-  fetchAllArticles(sort_by, order, topic)
+  models
+    .fetchAllArticles(sort_by, order, topic)
     .then((articles) => {
       res.status(200).send({ articles })
     })
@@ -32,7 +27,8 @@ exports.getAllArticles = (req, res, next) => {
 
 exports.getArticleComments = (req, res, next) => {
   const { article_id } = req.params
-  fetchArticleComments(article_id)
+  models
+    .fetchArticleComments(article_id)
     .then((comments) => {
       res.status(200).send({ comments })
     })
@@ -44,7 +40,8 @@ exports.getArticleComments = (req, res, next) => {
 exports.postCommentToArticle = (req, res, next) => {
   const { article_id } = req.params
   const comment = req.body
-  addCommentToArticle(article_id, comment)
+  models
+    .addCommentToArticle(article_id, comment)
     .then((comment) => {
       res.status(201).send({ comment })
     })
@@ -56,9 +53,10 @@ exports.postCommentToArticle = (req, res, next) => {
 exports.patchArticleVotes = (req, res, next) => {
   const { article_id } = req.params
   const votes = req.body.inc_votes
-  updateArticleVotes(article_id, votes)
+  models
+    .updateArticleVotes(article_id, votes)
     .then((article) => {
-      res.status(201).send(article)
+      res.status(200).send({ article: article[0] })
     })
     .catch((err) => {
       next(err)

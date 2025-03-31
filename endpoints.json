@@ -91,5 +91,14 @@
         { "username": "Perri Stryker", "name": "Gorbachov", "avatar_url": "www.glasnost.su" }
       ]
     }
+  },
+  "GET /api/users/:user_id": {
+    "description": "serves an array containing user_obj with the information on the user with the specified username",
+    "queries": [],
+    "exampleResponse": {
+      "user": [
+        { "username": "Perri Stryker", "name": "Gorbachov", "avatar_url": "www.glasnost.su" }
+      ]
+    }
   }
 }
