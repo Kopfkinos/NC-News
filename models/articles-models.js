@@ -85,3 +85,20 @@ exports.updateArticleVotes = (article_id, votes) => {
       return rows
     })
 }
+
+exports.addArticle = (articleObj) => {
+  const { author, title, body, topic, article_img_url } = articleObj
+
+  if (!author | !title | !body | !topic) {
+    return generatePromiseReject(400, "article")
+  }
+
+  return db
+    .query(
+      `INSERT INTO articles (author, title, body, topic, article_img_url) VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+      [author, title, body, topic, article_img_url]
+    )
+    .then(({ rows }) => {
+      return rows
+    })
+}

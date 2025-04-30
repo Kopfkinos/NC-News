@@ -58,14 +58,15 @@ function createArticles() {
   return db.query(`
     CREATE TABLE articles (
       article_id SERIAL PRIMARY KEY,
-      title VARCHAR,
-      topic VARCHAR 
+      title VARCHAR NOT NULL,
+      topic VARCHAR NOT NULL
         CONSTRAINT fk_topic REFERENCES topics(slug),
-      author VARCHAR
+      author VARCHAR NOT NULL
         CONSTRAINT fk_author REFERENCES users(username),
-      body TEXT,
+      body TEXT NOT NULL,
       created_at TIMESTAMP,
-      votes INTEGER,
+      votes INT DEFAULT 0,
+      comment_count INT DEFAULT 0,
       article_img_url VARCHAR (1000));`)
 }
 function createComments() {

@@ -484,9 +484,99 @@ describe("/api/articles", () => {
         })
     })
   })
+  describe.only("POST /api/articles (post new article)", () => {
+    test("200: responds with created article + the newly assigned article_id, votes, created_at and comment_count", () => {
+      const testArticle = {
+        author: "lurker",
+        title: "how do I paint my hedgehog blue?",
+        body: "like can I just use normal paint or should I use a tinted moisturiser or something??",
+        topic: "mitch",
+        article_img_url: "https://cdn.pixabay.com/photo/2019/08/10/17/15/hedgehog-4397351_1280.jpg",
+      }
+
+      return request(app)
+        .post("/api/articles")
+        .send(testArticle)
+        .expect(200)
+        .then(({ body: { article } }) => {
+          expect(updatedArticle.author).toBe("lurker")
+          expect(updatedArticle.title).toBe("how do I paint my hedgehog blue?")
+          expect(updatedArticle.body).toBe(
+            "like can I just use normal paint or should I use a tinted moisturiser or something??"
+          )
+          expect(updatedArticle.topic).toBe("mitch")
+          expect(updatedArticle.article_img_url).toBe(
+            "https://cdn.pixabay.com/photo/2019/08/10/17/15/hedgehog-4397351_1280.jpg"
+          )
+          expect(typeof Number(updatedArticle.article_id)).toBe("number")
+          expect(isNaN(Number(updatedArticle.article_id))).toBe(false)
+          expect(Number(updatedArticle.votes)).toBe(0)
+          expect(Number(updatedArticle.comment_count)).toBe(0)
+          expect(typeof updatedArticle.created_at).toBe("object")
+        })
+    })
+    test("400: returns error if author not provided", () => {
+      const testArticle = {
+        title: "how do I paint my hedgehog blue?",
+        body: "like can I just use normal paint or should I use a tinted moisturiser or something??",
+        topic: "mitch",
+      }
+
+      return request(app)
+        .post("/api/articles")
+        .send(testArticle)
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid article!")
+        })
+    })
+    test("400: returns error if title not provided", () => {
+      const testArticle = {
+        body: "like can I just use normal paint or should I use a tinted moisturiser or something??",
+        topic: "mitch",
+        author: "lurker",
+      }
+
+      return request(app)
+        .post("/api/articles")
+        .send(testArticle)
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid article!")
+        })
+    })
+    test("400: returns error if body not provided", () => {
+      const testArticle = {
+        title: "tiggly tollies",
+        topic: "mitch",
+        author: "lurker",
+      }
+      return request(app)
+        .post("/api/articles")
+        .send(testArticle)
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid article!")
+        })
+    })
+    test("400: returns error if topic not provided", () => {
+      const testArticle = {
+        title: "tiggly tollies",
+        author: "lurker",
+        body: "like can I just use normal paint or should I use a tinted moisturiser or something??",
+      }
+      return request(app)
+        .post("/api/articles")
+        .send(testArticle)
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid article!")
+        })
+    })
+  })
 })
 
-describe.only("/api/comments", () => {
+describe("/api/comments", () => {
   describe("DELETE /api/comments/:comment_id", () => {
     test("receives a 204 status and no content", () => {
       const comment_id = 1

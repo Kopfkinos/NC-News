@@ -62,3 +62,16 @@ exports.patchArticleVotes = (req, res, next) => {
       next(err)
     })
 }
+
+exports.postArticle = (req, res, next) => {
+  const articleObj = req.body
+  models
+    .addArticle(articleObj)
+    .then((updatedArticle) => {
+      res.status(200).send({ article: article[0] })
+    })
+    .catch((err) => {
+      console.log(err)
+      next(err)
+    })
+}
