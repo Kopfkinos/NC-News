@@ -2,7 +2,7 @@ articlesRouter = require("express").Router()
 
 const controllers = require("../controllers/controllers-index")
 
-articlesRouter.get("/", controllers.getAllArticles)
+articlesRouter.get("/", controllers.getAllArticles).post("/", controllers.postArticle)
 
 articlesRouter
   .route("/:article_id")
