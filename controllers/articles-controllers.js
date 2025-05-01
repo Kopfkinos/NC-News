@@ -13,14 +13,16 @@ exports.getArticleById = (req, res, next) => {
 }
 
 exports.getAllArticles = (req, res, next) => {
-  const { sort_by, order, topic } = req.query
-
+  const { sort_by, order, topic, limit, page } = req.query
   models
-    .fetchAllArticles(sort_by, order, topic)
+    .fetchAllArticles(sort_by, order, topic, limit, page)
     .then((articles) => {
-      res.status(200).send({ articles })
+      models.fetchTotalArticleCount(topic).then(({ count }) => {
+        res.status(200).send({ articles, total_count: count })
+      })
     })
     .catch((err) => {
+      console.log(err)
       next(err)
     })
 }
@@ -67,11 +69,10 @@ exports.postArticle = (req, res, next) => {
   const articleObj = req.body
   models
     .addArticle(articleObj)
-    .then((updatedArticle) => {
+    .then((article) => {
       res.status(200).send({ article: article[0] })
     })
     .catch((err) => {
-      console.log(err)
       next(err)
     })
 }
