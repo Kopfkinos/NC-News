@@ -484,7 +484,7 @@ describe("/api/articles", () => {
         })
     })
   })
-  describe.only("POST /api/articles (post new article)", () => {
+  describe("POST /api/articles (post new article)", () => {
     test("200: responds with created article + the newly assigned article_id, votes, created_at and comment_count", () => {
       const testArticle = {
         author: "lurker",
@@ -499,20 +499,20 @@ describe("/api/articles", () => {
         .send(testArticle)
         .expect(200)
         .then(({ body: { article } }) => {
-          expect(updatedArticle.author).toBe("lurker")
-          expect(updatedArticle.title).toBe("how do I paint my hedgehog blue?")
-          expect(updatedArticle.body).toBe(
+          expect(article.author).toBe("lurker")
+          expect(article.title).toBe("how do I paint my hedgehog blue?")
+          expect(article.body).toBe(
             "like can I just use normal paint or should I use a tinted moisturiser or something??"
           )
-          expect(updatedArticle.topic).toBe("mitch")
-          expect(updatedArticle.article_img_url).toBe(
+          expect(article.topic).toBe("mitch")
+          expect(article.article_img_url).toBe(
             "https://cdn.pixabay.com/photo/2019/08/10/17/15/hedgehog-4397351_1280.jpg"
           )
-          expect(typeof Number(updatedArticle.article_id)).toBe("number")
-          expect(isNaN(Number(updatedArticle.article_id))).toBe(false)
-          expect(Number(updatedArticle.votes)).toBe(0)
-          expect(Number(updatedArticle.comment_count)).toBe(0)
-          expect(typeof updatedArticle.created_at).toBe("object")
+          expect(typeof Number(article.article_id)).toBe("number")
+          expect(isNaN(Number(article.article_id))).toBe(false)
+          expect(Number(article.votes)).toBe(0)
+          expect(Number(article.comment_count)).toBe(0)
+          expect(typeof article.created_at).toBe("object")
         })
     })
     test("400: returns error if author not provided", () => {
@@ -571,6 +571,78 @@ describe("/api/articles", () => {
         .expect(400)
         .then(({ body: { msg } }) => {
           expect(msg).toBe("Invalid article!")
+        })
+    })
+  })
+  describe("PAGINATION /api/articles", () => {
+    test("returns an array of 10 articles when passed no limit and no page values", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles.length).toBe(10)
+        })
+    })
+    test("returns an array of 5 articles when query provides a string limit of 5", () => {
+      return request(app)
+        .get("/api/articles")
+        .query({
+          limit: "5",
+        })
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles.length).toBe(5)
+        })
+    })
+    test("returns an array of 6 articles when query provides an INT limit of 6", () => {
+      return request(app)
+        .get("/api/articles")
+        .query({
+          limit: 6,
+        })
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles.length).toBe(6)
+        })
+    })
+    test("returns array of 5 articles with limit 5 and page 1, following query of page 2 contains the next 5 articles with created_at in past", () => {
+      return request(app)
+        .get("/api/articles")
+        .query({
+          limit: 5,
+          page: 1,
+        })
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          const lastArticleTimeStampPage1 = articles[4].created_at
+          return request(app)
+            .get("/api/articles")
+            .query({
+              limit: 5,
+              page: 2,
+            })
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              const lastArticleTimeStampPage2 = articles[4].created_at
+              expect(lastArticleTimeStampPage1 > lastArticleTimeStampPage2)
+            })
+        })
+    })
+    test("returns total_count property on the return object containing the full number of articles when no topic filters applied", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body: { total_count } }) => {
+          expect(total_count).toBe("13")
+        })
+    })
+    test("returns total_count property when topic filter is applied", () => {
+      return request(app)
+        .get("/api/articles")
+        .query({ topic: "mitch" })
+        .expect(200)
+        .then(({ body: { total_count } }) => {
+          expect(total_count).toBe("12")
         })
     })
   })

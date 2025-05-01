@@ -15,31 +15,67 @@ exports.fetchArticleById = (article_id) => {
     })
 }
 
-exports.fetchAllArticles = (sort_by = "created_at", order = "desc", topic) => {
+exports.fetchAllArticles = (
+  sort_by = "created_at",
+  order = "desc",
+  topic,
+  limit = "10",
+  page = "1"
+) => {
   const whiteList = ["created_at", "topic", "author", "votes", "desc", "asc"]
   const binders = []
 
-  let queryStr = `SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url, COUNT(articles.article_id) AS comment_count FROM articles JOIN comments ON comments.article_id = articles.article_id `
+  if (typeof limit !== "string") {
+    limit = parseInt(limit)
+  }
+  if (typeof page !== "string") {
+    page = parseInt(page)
+  }
+
+  if (!whiteList.includes(sort_by) || !whiteList.includes(order)) {
+    return generatePromiseReject(400, "query")
+  }
+  if (isNaN(limit) || limit > 50 || limit < 1) {
+    return generatePromiseReject(400, "limit query")
+  }
+  if (isNaN(page) || page < 1) {
+    return generatePromiseReject(400, "page query")
+  }
+
+  let queryStr = `SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count FROM articles LEFT OUTER JOIN comments ON comments.article_id = articles.article_id`
 
   if (topic) {
     if (topic.length > 200) {
       return generatePromiseReject(400, "topic string query")
     }
     binders.push(topic)
-    queryStr += `WHERE TOPIC = $1 `
+    queryStr += ` WHERE articles.topic = $1`
   }
 
-  if (!whiteList.includes(sort_by) || !whiteList.includes(order)) {
-    return generatePromiseReject(400, "query")
-  }
-
-  queryStr += `GROUP BY articles.article_id ORDER BY ${sort_by} ${order}`
+  queryStr += ` GROUP BY articles.article_id ORDER BY ${sort_by} ${order} LIMIT ${limit} OFFSET ${
+    (page - 1) * limit
+  }`
 
   return db.query(queryStr, binders).then(({ rows }) => {
     if (rows.length === 0) {
       return generatePromiseReject(404, "Topic")
     }
     return rows
+  })
+}
+
+exports.fetchTotalArticleCount = (topic) => {
+  let queryStr = `SELECT COUNT(article_id) FROM articles`
+
+  const binders = []
+
+  if (topic) {
+    binders.push(topic)
+    queryStr += ` WHERE topic = $1`
+  }
+
+  return db.query(queryStr, binders).then(({ rows }) => {
+    return rows[0]
   })
 }
 
