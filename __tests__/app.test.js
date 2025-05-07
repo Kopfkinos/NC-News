@@ -722,12 +722,10 @@ describe("/api/articles", () => {
       return request(app)
         .get("/api/articles/1/comments")
         .query({ limit: 5, page: 5 })
-        .then(({ body: { comments } }) => {
-          console.log(comments)
-        })
+        .then(({ body: { comments } }) => {})
     })
   })
-  describe.only("DELETE /api/articles/:article_id", () => {
+  describe("DELETE /api/articles/:article_id", () => {
     test("204: responds with a 204 status and no content", () => {
       return request(app)
         .delete("/api/articles/1")
@@ -747,7 +745,7 @@ describe("/api/articles", () => {
             })
         })
     })
-    test.only("404: responds with not found error if article id doesn't exist", () => {
+    test("404: responds with not found error if article id doesn't exist", () => {
       return request(app)
         .delete("/api/articles/1991")
         .expect(404)
