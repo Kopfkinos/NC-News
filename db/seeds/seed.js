@@ -74,7 +74,7 @@ function createComments() {
     CREATE TABLE comments (
       comment_id SERIAL PRIMARY KEY,
       article_id INTEGER
-        CONSTRAINT fk_article_id REFERENCES articles(article_id),
+        CONSTRAINT fk_article_id REFERENCES articles(article_id) ON DELETE CASCADE,
       body TEXT,
       votes INT DEFAULT 0,
       author VARCHAR 

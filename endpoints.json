@@ -66,6 +66,11 @@
       "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
     }
   },
+  "DELETE /api/articles/:article_id": {
+    "description": "removes article with the specified article id",
+    "queries": [],
+    "exampleResponse": {}
+  },
   "GET /api/articles/:article_id/comments": {
     "description": "serves comments on article with specified article id",
     "queries": [],

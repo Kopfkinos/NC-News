@@ -50,6 +50,35 @@ describe("/api/topics", () => {
         })
     })
   })
+  describe.only("POST /api/topics", () => {
+    test("200: responds with newly added topic obj containing slug and description and img url", () => {
+      const newTopic = {
+        slug: "divas",
+        description: "who's your favourite divalicious diva?",
+      }
+
+      return request(app)
+        .post("/api/topics")
+        .send(newTopic)
+        .expect(200)
+        .then(({ body: { postedTopic } }) => {
+          expect(postedTopic[0].slug).toBe("divas")
+          expect(postedTopic[0].description).toBe("who's your favourite divalicious diva?")
+          expect(postedTopic[0].img_url).toBe(null)
+        })
+    })
+    test.only("400: responds with error msg if topic already exists", () => {
+      return request(app)
+        .post("/api/topics")
+        .send({
+          topic: "i love testing!!",
+        })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid topic!")
+        })
+    })
+  })
 })
 
 describe("/api/articles", () => {
@@ -605,7 +634,7 @@ describe("/api/articles", () => {
           expect(articles.length).toBe(6)
         })
     })
-    test("returns array of 5 articles with limit 5 and page 1, following query of page 2 contains the next 5 articles with created_at in past", () => {
+    test("returns array of 5 articles with limit 5 and page 1, following query of page 2 contains the next 5 articles ", () => {
       return request(app)
         .get("/api/articles")
         .query({
@@ -643,6 +672,85 @@ describe("/api/articles", () => {
         .expect(200)
         .then(({ body: { total_count } }) => {
           expect(total_count).toBe("12")
+        })
+    })
+  })
+  describe("PAGINATION /api/articles/:article_id/comments", () => {
+    test("responds with array of 10 comments when passed no limit", () => {
+      return request(app)
+        .get("/api/articles/1/comments")
+        .expect(200)
+        .then(({ body: { comments } }) => {
+          expect(comments.length).toBe(10)
+        })
+    })
+    test("responds with array of 5 comments when passed a limit of 5", () => {
+      return request(app)
+        .get("/api/articles/1/comments")
+        .query({
+          limit: 5,
+        })
+        .expect(200)
+        .then(({ body: { comments } }) => {
+          expect(comments.length).toBe(5)
+        })
+    })
+    test("returns array of 5 comments with limit 5 and page 1, following query of page 2 contains the next 5 comments with an older created_at stamp", () => {
+      return request(app)
+        .get("/api/articles/1/comments")
+        .query({
+          limit: 5,
+          page: 1,
+        })
+        .expect(200)
+        .then(({ body: { comments } }) => {
+          const lastCommentTimeStampPage1 = comments[4].created_at
+          return request(app)
+            .get("/api/articles/1/comments")
+            .query({
+              limit: 5,
+              page: 2,
+            })
+            .expect(200)
+            .then(({ body: { comments } }) => {
+              const lastCommentTimeStampPage2 = comments[4].created_at
+              expect(lastCommentTimeStampPage1 > lastCommentTimeStampPage2)
+            })
+        })
+    })
+    test("400: returns error when page number queried is beyond the available number of comments", () => {
+      return request(app)
+        .get("/api/articles/1/comments")
+        .query({ limit: 5, page: 5 })
+        .then(({ body: { comments } }) => {})
+    })
+  })
+  describe("DELETE /api/articles/:article_id", () => {
+    test("204: responds with a 204 status and no content", () => {
+      return request(app)
+        .delete("/api/articles/1")
+        .expect(204)
+        .then((response) => {})
+    })
+    test("204: article has been successfully removed from database", () => {
+      return request(app)
+        .delete("/api/articles/1")
+        .expect(204)
+        .then((response) => {
+          return request(app)
+            .get("/api/articles/1")
+            .expect(404)
+            .then(({ body: { msg } }) => {
+              expect(msg).toBe("article doesn't exist! (yet...)")
+            })
+        })
+    })
+    test("404: responds with not found error if article id doesn't exist", () => {
+      return request(app)
+        .delete("/api/articles/1991")
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("article doesn't exist! (yet...)")
         })
     })
   })

@@ -79,15 +79,31 @@ exports.fetchTotalArticleCount = (topic) => {
   })
 }
 
-exports.fetchArticleComments = (article_id) => {
-  return db
-    .query("SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC", [article_id])
-    .then(({ rows }) => {
-      if (!rows.length) {
-        return generatePromiseReject(404, "article")
-      }
-      return rows
-    })
+exports.fetchArticleComments = (article_id, limit = 10, page = "1") => {
+  let queryString = "SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC"
+
+  if (typeof limit !== "string") {
+    limit = parseInt(limit)
+  }
+  if (isNaN(limit) || limit > 50 || limit < 1) {
+    return generatePromiseReject(400, "limit query")
+  }
+
+  if (typeof page !== "string") {
+    page = parseInt(page)
+  }
+  if (isNaN(page) || page < 1) {
+    return generatePromiseReject(400, "page query")
+  }
+
+  queryString += ` LIMIT ${limit} OFFSET ${page}`
+
+  return db.query(queryString, [article_id]).then(({ rows }) => {
+    if (!rows.length) {
+      return generatePromiseReject(404, "article id")
+    }
+    return rows
+  })
 }
 
 exports.addCommentToArticle = (article_id, comment) => {
@@ -135,6 +151,14 @@ exports.addArticle = (articleObj) => {
       [author, title, body, topic, article_img_url]
     )
     .then(({ rows }) => {
-      return rows
+      return rows[0]
     })
+}
+
+exports.removeArticle = (article_id) => {
+  return db.query(`DELETE from articles WHERE article_id = $1`, [article_id]).then(({ rows }) => {
+    if (rows.length === 0) {
+      return generatePromiseReject(404, "article")
+    } else return
+  })
 }
