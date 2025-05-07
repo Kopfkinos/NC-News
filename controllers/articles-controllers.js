@@ -29,8 +29,9 @@ exports.getAllArticles = (req, res, next) => {
 
 exports.getArticleComments = (req, res, next) => {
   const { article_id } = req.params
+  const { limit } = req.query
   models
-    .fetchArticleComments(article_id)
+    .fetchArticleComments(article_id, limit)
     .then((comments) => {
       res.status(200).send({ comments })
     })
@@ -71,6 +72,18 @@ exports.postArticle = (req, res, next) => {
     .addArticle(articleObj)
     .then((article) => {
       res.status(200).send({ article: article[0] })
+    })
+    .catch((err) => {
+      next(err)
+    })
+}
+
+exports.deleteArticle = (req, res, next) => {
+  const { article_id } = req.params
+  models
+    .removeArticle(article_id)
+    .then(() => {
+      res.status(204).send()
     })
     .catch((err) => {
       next(err)
