@@ -100,7 +100,7 @@ exports.fetchArticleComments = (article_id, limit = 10, page = "1") => {
 
   return db.query(queryString, [article_id]).then(({ rows }) => {
     if (!rows.length) {
-      return generatePromiseReject(404, "article id")
+      return generatePromiseReject(404, "article")
     }
     return rows
   })
@@ -140,7 +140,6 @@ exports.updateArticleVotes = (article_id, votes) => {
 
 exports.addArticle = (articleObj) => {
   const { author, title, body, topic, article_img_url } = articleObj
-
   if (!author | !title | !body | !topic) {
     return generatePromiseReject(400, "article")
   }
@@ -156,9 +155,11 @@ exports.addArticle = (articleObj) => {
 }
 
 exports.removeArticle = (article_id) => {
-  return db.query(`DELETE from articles WHERE article_id = $1`, [article_id]).then(({ rows }) => {
-    if (rows.length === 0) {
-      return generatePromiseReject(404, "article")
-    } else return
-  })
+  return db
+    .query(`DELETE from articles WHERE article_id = $1 RETURNING *`, [article_id])
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return generatePromiseReject(404, "article")
+      } else return
+    })
 }
