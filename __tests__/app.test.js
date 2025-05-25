@@ -50,7 +50,7 @@ describe("/api/topics", () => {
         })
     })
   })
-  describe.only("POST /api/topics", () => {
+  describe("POST /api/topics", () => {
     test("200: responds with newly added topic obj containing slug and description and img url", () => {
       const newTopic = {
         slug: "divas",
@@ -67,7 +67,7 @@ describe("/api/topics", () => {
           expect(postedTopic[0].img_url).toBe(null)
         })
     })
-    test.only("400: responds with error msg if topic already exists", () => {
+    test("400: responds with error msg if topic already exists", () => {
       return request(app)
         .post("/api/topics")
         .send({
@@ -730,15 +730,17 @@ describe("/api/articles", () => {
       return request(app)
         .delete("/api/articles/1")
         .expect(204)
-        .then((response) => {})
+        .then(({ body }) => {
+          expect(body).toEqual({})
+        })
     })
     test("204: article has been successfully removed from database", () => {
       return request(app)
-        .delete("/api/articles/1")
+        .delete("/api/articles/2")
         .expect(204)
         .then((response) => {
           return request(app)
-            .get("/api/articles/1")
+            .get("/api/articles/2")
             .expect(404)
             .then(({ body: { msg } }) => {
               expect(msg).toBe("article doesn't exist! (yet...)")

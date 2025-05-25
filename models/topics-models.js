@@ -13,7 +13,6 @@ exports.addTopic = (slug, description) => {
   return db
     .query(queryStr, [slug, description])
     .then(({ rows }) => {
-      console.log("then")
       return rows
     })
     .catch((err) => {

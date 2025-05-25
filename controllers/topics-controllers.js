@@ -1,6 +1,6 @@
 const models = require("../models/topics-models")
 
-exports.getTopics = (res, next) => {
+exports.getTopics = (req, res, next) => {
   models
     .fetchTopics()
     .then((topics) => {

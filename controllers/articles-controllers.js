@@ -70,7 +70,7 @@ exports.postArticle = (req, res, next) => {
   models
     .addArticle(articleObj)
     .then((article) => {
-      res.status(200).send({ article: article[0] })
+      res.status(200).send({ article })
     })
     .catch((err) => {
       next(err)
